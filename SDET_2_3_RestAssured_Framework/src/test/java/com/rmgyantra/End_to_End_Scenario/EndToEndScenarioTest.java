@@ -1,6 +1,8 @@
 package com.rmgyantra.End_to_End_Scenario;
 
+import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.port;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,13 +19,16 @@ import org.testng.annotations.Test;
 
 import com.mysql.cj.jdbc.Driver;
 import com.rmgyantra.ProjectLibrary.pojoLibrary;
+import com.rmgyantra.genericUtilities.BaseAPIClass;
 import com.rmgyantra.genericUtilities.DataBaseUtility;
+import com.rmgyantra.genericUtilities.EndPoints;
+import com.rmgyantra.genericUtilities.JSONUtility;
 import com.rmgyantra.genericUtilities.JavaUtility;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
-public class EndToEndScenarioTest extends DataBaseUtility {
+public class EndToEndScenarioTest extends BaseAPIClass implements EndPoints{
 	
 	@Test
 	public void endToEndScenario() throws Throwable
@@ -33,28 +38,27 @@ public class EndToEndScenarioTest extends DataBaseUtility {
 		
 		pojoLibrary pl=new pojoLibrary("SSS", "TechM"+jUtil.generateRandomNumber(), "Created", 7);
 		
+		baseURI="http://localhost";
+		port=8084;
+		
 		Response rsps = given()
 		.contentType(ContentType.JSON)
 		.body(pl)
 		.when()
-		.post("http://localhost:8084/addProject");
+		.post(EndPoints.createProj);
 		
-	    String projectid = rsps.jsonPath().get("projectId");
-	    System.out.println(projectid);
+	    JSONUtility jsUtil=new JSONUtility();
+	    String projectid = jsUtil.jsonPathFinder("projectId", rsps);
 	    
 	    Response rsps1 = given()
 	    .pathParam("ProId", projectid)
 	    .when()
 	    .get("http://localhost:8084/projects/{ProId}");
 	    
-	    String projectName=rsps1.jsonPath().get("projectName");
-	    System.out.println(projectName);
+        String projectName = jsUtil.jsonPathFinder("projectName", rsps1);
 	    
 	    //JDBC code for verifying in Database
-	    DataBaseUtility dUtil=new DataBaseUtility();
-	    dUtil.connectToDatabase();
-	    
-	    result=dUtil.executingQuery("select * from project");
+	    ResultSet result=dUtil.executingQuery("select * from project");
 	    while(result.next())
 	    {
 	    	if(result.getString(4).equals(projectName))
@@ -62,8 +66,6 @@ public class EndToEndScenarioTest extends DataBaseUtility {
 	    		System.out.println(projectName+" is matching");
 	    	}
 	    }
-	    dUtil.closeConnection();
-	    
 	}
 
 }

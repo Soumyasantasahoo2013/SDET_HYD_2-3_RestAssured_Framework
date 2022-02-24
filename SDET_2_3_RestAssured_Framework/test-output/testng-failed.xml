@@ -3,11 +3,11 @@
 <suite name="Failed suite [Default suite]" guice-stage="DEVELOPMENT">
   <test thread-count="5" name="Default test(failed)">
     <classes>
-      <class name="com.rmgyantra.End_to_End_Scenario.EndToEndScenarioTest">
+      <class name="com.rmgyantra.Authentication.preemptiveAndDigestiveAuthTest">
         <methods>
-          <include name="endToEndScenario"/>
+          <include name="preemptive"/>
         </methods>
-      </class> <!-- com.rmgyantra.End_to_End_Scenario.EndToEndScenarioTest -->
+      </class> <!-- com.rmgyantra.Authentication.preemptiveAndDigestiveAuthTest -->
     </classes>
   </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->
